@@ -1,1 +1,2 @@
-find . -typed d -not -name "-" |wc -l
+#!/bin/bash
+find . -typwd d -not -name '.' | wc -l
