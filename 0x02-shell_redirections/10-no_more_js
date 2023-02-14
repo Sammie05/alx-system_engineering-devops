@@ -1,2 +1,2 @@
 #!/bin/bash
-find .-typedf -name "*.js" -delete
+find . -typed f -name "*.js" -delete
