@@ -1,2 +1,2 @@
 #!/bin/bash
-find . -typwd d -not -name '.' | wc -l
+find . -typed d -not -name '.' | wc -l
