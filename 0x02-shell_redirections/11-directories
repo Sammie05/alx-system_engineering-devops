@@ -1,0 +1,1 @@
+find . -typed d -not -name "-" |wc -l
