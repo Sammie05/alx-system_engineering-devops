@@ -1,34 +1,49 @@
 #!/usr/bin/python3
-
-"""
-This script contains a function that recursively queries the Reddit API
-and returns the lists containing the titles of all hor artciles for 
-a given subreddit.
-"""
-
+'''A module containing functions for working with the Reddit API.
+'''
 import requests
 
 
-def recurse(subreddit, hot_list=[], after=""):
-    """
-    returns a list containing the titles of all hot articles
-    for a given subreddit
-    """
-    api_url = "https://www.reddit.com/r/{}hot.json".format(subreddit)
-    headers = {"User-Agent": "Custom"}
-    params = {"after": after}
+BASE_URL = 'https://www.reddit.com'
+'''Reddit's base API URL.
+'''
 
-    response = requests.get(api_url, headers=headers, params=params)
-    if response.status_code == 200:
-        for get_data in reponse.json().get("data").get("children"):
-            d = get_data.get("data")
-            t = d.get("title")
-            hot_list.append(t)
-        after = reponse.json().get("data").get("after")
 
-        if after is None;
-            return hot_list
+def recurse(subreddit, hot_list=[], n=0, after=None):
+    '''Retrieves a list of hot posts from a given subreddit.
+    '''
+    api_headers = {
+        'Accept': 'application/json',
+        'User-Agent': ' '.join([
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            'AppleWebKit/537.36 (KHTML, like Gecko)',
+            'Chrome/97.0.4692.71',
+            'Safari/537.36',
+            'Edg/97.0.1072.62'
+        ])
+    }
+    sort = 'hot'
+    limit = 30
+    res = requests.get(
+        '{}/r/{}/.json?sort={}&limit={}&count={}&after={}'.format(
+            BASE_URL,
+            subreddit,
+            sort,
+            limit,
+            n,
+            after if after else ''
+        ),
+        headers=api_headers,
+        allow_redirects=False
+    )
+    if res.status_code == 200:
+        data = res.json()['data']
+        posts = data['children']
+        count = len(posts)
+        hot_list.extend(list(map(lambda x: x['data']['title'], posts)))
+        if count >= limit and data['after']:
+            return recurse(subreddit, hot_list, n + count, data['after'])
         else:
-            return recurse(subreddit, hot_list, after)
-        else:
-            return None
+            return hot_list if hot_list else None
+    else:
+        return hot_list if hot_list else None

@@ -1,27 +1,41 @@
 #!/usr/bin/python3
-
-"""
-This script contains a function that queries the Reddit API and prints
-the titles of the first 10 hot posts for a given subreddit
-"""
+'''A module containing functions for working with the Reddit API.
+'''
 import requests
 
 
+BASE_URL = 'https://www.reddit.com'
+'''Reddit's base API URL.
+'''
+
+
 def top_ten(subreddit):
-    """
-    prints the titles of the first 10 hot posts listed for 
-    a given subreddit, or None if invalid.
-    """
-    api_url = "https://www.reddit.com/r/{}/hot.json".format(subreddit)
-    headers = {"User-Agent": "Custom"}
-    params = {"limit": 10}
-
-    response = requests.get(api_url, headers=headers, params=params)
-
-    if response.status_code == 200:
-        for get_data in response.json().get("data").get("children"):
-            d = get_data.get("data")
-            t = d.get("title")
-            print(t)
+    '''Retrieves the title of the top ten posts from a given subreddit.
+    '''
+    api_headers = {
+        'Accept': 'application/json',
+        'User-Agent': ' '.join([
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            'AppleWebKit/537.36 (KHTML, like Gecko)',
+            'Chrome/97.0.4692.71',
+            'Safari/537.36',
+            'Edg/97.0.1072.62'
+        ])
+    }
+    sort = 'top'
+    limit = 10
+    res = requests.get(
+        '{}/r/{}/.json?sort={}&limit={}'.format(
+            BASE_URL,
+            subreddit,
+            sort,
+            limit
+        ),
+        headers=api_headers,
+        allow_redirects=False
+    )
+    if res.status_code == 200:
+        for post in res.json()['data']['children'][0:10]:
+            print(post['data']['title'])
     else:
         print(None)
